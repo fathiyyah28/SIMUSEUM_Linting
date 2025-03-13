@@ -1,0 +1,36 @@
+name: Laravel Code Linting
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          tools: composer, php-cs-fixer, pint
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run Laravel Pint Linter
+        run: vendor/bin/pint --test
+
+      - name: Run PHP_CodeSniffer
+        run: vendor/bin/phpcs --standard=PSR12 app/
+
+      - name: Run ESLint for JavaScript
+        run: npx eslint resources/js/**/*.js
+
+      - name: Run Prettier for Formatting
+        run: npx prettier --check resources/js/**/*.js
